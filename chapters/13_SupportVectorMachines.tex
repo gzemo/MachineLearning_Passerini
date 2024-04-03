@@ -484,11 +484,12 @@ subject to
 	\sum_{i=1}^{m}\alpha_{i}y_{i}= 0
 \]
 In this soft constraint, $\alpha_{i}$ needs to be non-negative, but also at most
-equal $C$ (from \ref{eq:soft_margin_xi_gradient}). This box constraint is the only
+equal $C$ (from \ref{eq:soft_margin_xi_gradient}): in other words it is upper-bounded by $C$.
+This box constraint is the only
 difference from the hard case when we transform the problem in the dual form.\\
 
-The interesting fact is that the support vectors: in the Lagrangian (KKT
-conditions), when we get to the saddle point it holds that
+\noindent{\textbf{Which observations works as Support Vectors?}}
+in the Lagrangian formulation (KKT conditions), when we get to the saddle point, it holds that:
 \[
 	\alpha_{i}(y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) - 1 + \xi_{i}) = 0 \quad \forall
 	i
@@ -497,29 +498,54 @@ and
 \[
 	\beta_{i}\xi_{i}= 0 \quad \forall i
 \]
+
+
 This implies that the support vectors, if $\alpha_{i}= 0$, the example does not
 contribute to the decision. If $\alpha_{i}> 0$ than it is necessarily true that $(
 y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) - 1 + \xi_{i}) = 0$. This happens because
 we have and additional constraint (\ref{eq:soft_margin_xi_gradient}) that is not
-a KKT condition but comes directly from the derivative. Suppose that $\alpha_{i}<
-C$, then
-\[
-	C - \alpha_{i}- \beta_{i}= 0 \implies \beta_{i}> 0
-\]
-If $\beta_{i}> 0$, then to satisfy $\beta_{i}\xi_{i}= 0$ we need $\xi_{i}= 0$.
-Therefore
-\[
-	y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) = 1
-\]
-which is the same condition of the hard margin SVMs. The examples stay on the hyperplane
-with confidence one. For any example that has a confidence greater than zero but
-smaller than $C$, this example stays on the hyperplane with confidence equal to one.
-\\
+a KKT condition but comes directly from the derivative.
+We may define two conditions for which the current $i-th$ observation 
+may yield a support vector according to whether:
 
-For the examples for which $\alpha_{i}= C$, it means that $\beta_{i}= 0$, then $\xi
-_{i}$ does not have to be equal to zero (typically it is not). Therefore the
-example won't be on the confidence one hyperplane, but closer to the decision hyperplane
-(the confidence is less than one). These are called \textit{margin errors}.\\
+\begin{itemize}
+	\item \textbf{Unbound} support vectors: if $\alpha_i < C$ this implies that $C - \alpha_{i}- \beta_{i}= 0 \implies \beta_{i}> 0$.
+ 		But if  $\beta_i > 0$ the only way to have $\beta_{i}\xi_{i}= 0$ is by $\xi_i =0$. As a consequence 
+   		$y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) - 1 + \xi_{i}) = 0$ can be expressed as $y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) = 1$ 
+     		which corresponds exactly to the Hard Margin case: namely, those observations whose $f(\pmb{x}_{i}) \in \{-1, 1\}$ are
+       		laying onto the margin and are contributing to the hyperplane definition.
+ 	\item \textbf{Bound} support vectors: on the contrary if $\alpha_i = C$ this implies that $C - \alpha_{i}- \beta_{i}= 0 \implies \beta_{i} = 0$.
+		If so, $\beta_{i}\xi_{i}= 0$ and $\xi_{i}$ is no more necessarily equal to zero and we may assume it to be $\xi_{i} > 0$.
+  		Therefore the example will not end up being on the confidence one hyperplane considering that $y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) = 1 - \xi_{i}$ ,
+    		but closer to the decision hyperplane (the confidence is less than one). These are called \textit{margin errors}.
+      		Additionaly, the observation can be placed with respect to the hyperplane according
+      		to the amount of error ($\xi_{i}$): if $ 0 < \xi_{i} < 1$ the observation will be classified 
+		in the correct side of the hyperplane even though it will present a lower confidence margin; 
+  		beside, if $\xi_{i} > 1$ the predicted label associated to that observation will belong to the wrong class and
+    		the point will lay on the wrong side of the hyperplane. 
+      		
+\end{itemize}
+
+%Suppose that $\alpha_{i}<
+%C$, then
+%\[
+%	C - \alpha_{i}- \beta_{i}= 0 \implies \beta_{i}> 0
+%\]
+%If $\beta_{i}> 0$, then to satisfy $\beta_{i}\xi_{i}= 0$ we need $\xi_{i}= 0$.
+%Therefore
+%\[
+%	y_{i}(\pmb{w}^{T}\pmb{x}_{i}+ w_{0}) = 1
+%\]
+%which is the same condition of the hard margin SVMs. The examples stay on the hyperplane
+%with confidence one. For any example that has a confidence greater than zero but
+%smaller than $C$, this example stays on the hyperplane with confidence equal to one.
+%\\
+
+%For the examples for which $\alpha_{i}= C$, it means that $\beta_{i}= 0$, then $\xi
+%_{i}$ does not have to be equal to zero (typically it is not). Therefore the
+%example won't be on the confidence one hyperplane, but closer to the decision hyperplane
+%(the confidence is less than one). These are called \textit{margin errors}.\\
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.35]{
@@ -532,10 +558,13 @@ example won't be on the confidence one hyperplane, but closer to the decision hy
 	\label{fig:SVM_soft}
 \end{figure}
 
-Both the examples with $\alpha_{i}\leq 0$ belong to the so called \textit{support
-vector} because they contribute to the definition of the separation hyperplane (bound
-and unbound support vectors). All other having $\alpha_{i}> 0$ do not contribute
-to the decision hyperplane.
+It is worth mentioning that all other observation whose $\alpha_{i} = 0$ are not contributing 
+to the decision hyperplane as in the Hard Margin condition.
+
+%Both the examples with $\alpha_{i}\leq 0$ belong to the so called \textit{support
+%vector} because they contribute to the definition of the separation hyperplane (bound
+%and unbound support vectors). All other having $\alpha_{i}> 0$ do not contribute
+%to the decision hyperplane.
 
 \section{Large scale SVM learning}
 Training SVMs is not very efficient (it is more than quadratic problem) for
